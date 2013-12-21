@@ -1,16 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#fa6a6a" >
-     
-    <TextView android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Design Top Rated Screen"
-        android:textSize="20dp"
-        android:layout_centerInParent="true"/>
-     
- 
-</RelativeLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.49" >
+
+   <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create easy a playlist on the pc with the free program Playlist Creator:" />
+
+        <ImageView
+            android:id="@+id/playlist_creator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="playlist_creator"
+            android:src="@drawable/playlist_creator" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Use the format m3u.\n
+Now put the m3u file in you music folder, the playlist will not work ,because the paths to the file are wrong.\n
+To fix this we need to edit the file.\n
+First read the file to check what you need to change, use default or the other path to open the playlist, only the name and .m3u needs to filled in.\n
+An example of a m3u file:\n\n
+
+#EXTM3U\n
+#EXTINF:295,PrimeMusic.ru November 2013 - 1 - Direct Dizko (Original Mix) (PrimeMusic.ru)\n
+\\\\DS2\music\\playlist luuk\\Sander Van Doorn and Yves V - Direct Dizko (Original Mix).mp3\n
+#EXTINF:243, -  - Revolution (Instrumental Mix)\n
+\\\\DS2\\music\\playlist luuk\\R3hab, Nervo, Ummet Ozcan - Revolution (Instrumental Mix).mp3\n
+#EXTINF:248, -  - R3HAB  - I NEED R3HAB 060\n
+\\\\DS2\\music\\playlist luuk\\Syn Cole - Miami 82 (Avicii Edit).mp3\n\n
+
+This needs to be changed to this if you put the m3u file in you music folder, so this is the folder with the mp3 in it:\n\n
+
+#EXTM3U\n
+#EXTINF:295,PrimeMusic.ru November 2013 - 1 - Direct Dizko (Original Mix) (PrimeMusic.ru)\n
+\\Sander Van Doorn and Yves V - Direct Dizko (Original Mix).mp3\n
+#EXTINF:243, -  - Revolution (Instrumental Mix)\n
+\\R3hab, Nervo, Ummet Ozcan - Revolution (Instrumental Mix).mp3\n
+#EXTINF:248, -  - R3HAB  - I NEED R3HAB 060\n
+\\Syn Cole - Miami 82 (Avicii Edit).mp3\n\n
+
+Now this can be done by filling in The text to replace with:\n
+\\\\DS2\\music\\playlist luuk\n
+And leave the With the following text just empty"/>
+    </TableLayout>
+
+</ScrollView>

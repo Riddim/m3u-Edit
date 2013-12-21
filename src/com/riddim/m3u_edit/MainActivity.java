@@ -14,7 +14,8 @@ import android.view.Menu;
 
 public class MainActivity extends Base implements ActionBar.TabListener, Edit_File.OnHeadlineSelectedListener{
  
-
+	
+	
 	private ViewPager viewPager;
 	private TabsPagerAdapter mAdapter;
 	private ActionBar actionBar;

@@ -3,6 +3,9 @@ package com.riddim.m3u_edit;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,6 +13,7 @@ import java.io.IOException;
 import com.riddim.m3u_edit.R;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,40 +27,46 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+
 import com.riddim.m3u_edit.Base;
 
 public class Edit_File extends Fragment{
-	String Filename;
+	View  view;
+
 	String lineChange;
 	String replace;
-	View  view;
+
 	String path;
 	String encoded = "";
-	
+
+	String tempfile = "lastplay";
+	FileOutputStream outputStream;
+
+
 	OnHeadlineSelectedListener mCallback;
 
 	MainActivity main = new MainActivity();
-	
-    // Container Activity must implement this interface
-    public interface OnHeadlineSelectedListener {
-        public void onArticleSelected(String encoded);
-    }
-	
+
+	// Container Activity must implement this interface
+	public interface OnHeadlineSelectedListener {
+		public void onArticleSelected(String encoded);
+	}
+
 	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mCallback = (OnHeadlineSelectedListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
-        }
-    }
-	
-	
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		// This makes sure that the container activity has implemented
+		// the callback interface. If not, it throws an exception
+		try {
+			mCallback = (OnHeadlineSelectedListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement OnHeadlineSelectedListener");
+		}
+	}
+
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		view = inflater.inflate(R.layout.edit_file, container, false);
@@ -65,13 +75,35 @@ public class Edit_File extends Fragment{
 		path = "/storage/sdcard1/Music";
 		defaultloc.setText(path);
 
+		//Read File internal file
+	
+			FileInputStream fis;
+			String result = "";
+			try {
+				fis = ((MainActivity)getActivity()).openFileInput(tempfile);
+				byte[] input = new byte[fis.available()];
+				while (fis.read(input) != -1) {}
+				result += new String(input);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace(); 
+			}  
+
+
+			// Set result
+			TextView filetext =(TextView) view.findViewById(R.id.filetext);
+			filetext.setText(result);
+
+
+		// set checkbox false
 		Button ReadWebPage = (Button)view.findViewById(R.id.letgo);
 		final CheckBox checkBox = (CheckBox) view.findViewById(R.id.defaultcheck);
 		if (checkBox.isChecked()) {
 			checkBox.setChecked(false);
 		};
 
-	    
+		// checkbox settings
 		checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			@Override
 			public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
@@ -98,11 +130,11 @@ public class Edit_File extends Fragment{
 				Intent intent = new Intent(getActivity(), tempSee_File.class);
 				intent.putExtra("text", encoded);
 				startActivity(intent);
-				
+
 			}
-			
+
 		});
-		
+
 		ReadWebPage.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
@@ -119,7 +151,7 @@ public class Edit_File extends Fragment{
 					File myDir = new File(path);    
 					myDir.mkdirs();
 
-				//	strFilePath = "playlistorgr.m3u";
+					//		strFilePath = "playlistorgr.m3u";
 
 					File f = new File (myDir, strFilePath);
 
@@ -160,7 +192,7 @@ public class Edit_File extends Fragment{
 
 					}catch (Exception e){
 						System.err.println("Error: " + e.getMessage());
-						
+
 					}
 
 					try {
@@ -180,27 +212,42 @@ public class Edit_File extends Fragment{
 						TextView filetext =(TextView) view.findViewById(R.id.filetext);
 						filetext.setText(encoded);
 
-						
-						
-						
 						mCallback.onArticleSelected(encoded);
 
-						
+
 					} catch (IOException e) {
-				
+
 						e.printStackTrace();
 					}
 				}
 				else{
 					//	Show.setText("Error no access to sd card");		
-				
+
 					main.createDialog("Error no access to sd card", "Ok", "Error", true);
 				}
+
+
+
+				String string = encoded;
+
+				// make internal tempfile with encoded
+				try {
+					outputStream = ((Context)getActivity()).openFileOutput(tempfile, Context.MODE_PRIVATE);
+					outputStream.write(string.getBytes());
+					outputStream.close();
+				} catch (Exception e) {
+					((MainActivity)getActivity()).createDialog("No File created", "Dismiss", "Error", true);
+					e.printStackTrace();
+				}
+
+
 			}
 		});
+
 		return view;
 	}
 
+	// read user input
 	public String DefaultProg(){	
 		TextView Change =(TextView) view.findViewById(R.id.replace);
 		lineChange = Change.getText().toString();
@@ -211,6 +258,7 @@ public class Edit_File extends Fragment{
 		return lineChange + replace;
 	}
 
+	// check external storage 
 	public boolean isExternalStorageWritable() {
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
