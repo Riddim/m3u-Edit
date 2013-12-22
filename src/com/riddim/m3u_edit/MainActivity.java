@@ -20,9 +20,9 @@ public class MainActivity extends Base implements ActionBar.TabListener, Edit_Fi
 	private TabsPagerAdapter mAdapter;
 	private ActionBar actionBar;
 	// Tab titles
-	private String[] tabs = { "Help Me", "Edit File", "See File" };
+	private String[] tabs = { "Help Me", "Edit File", "Settings" };
 			
-	Fragment see = new See_File();
+	Fragment see = new Settings();
 	
 	public void onArticleSelected(String encoded) {
 		

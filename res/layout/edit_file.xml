@@ -63,16 +63,27 @@
     <Button
         android:id="@+id/letgo"
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Let go" />
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:text="Let go" 
+        android:layout_weight="2"/>
 
     <Button
         android:id="@+id/fullscreen"
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Full Screen" />
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:text="Full Screen" 
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/refresh"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:text="Refresh" 
+        android:layout_weight="1"/>
+
  </TableRow>
     <ScrollView
         android:id="@+id/scrollView1"

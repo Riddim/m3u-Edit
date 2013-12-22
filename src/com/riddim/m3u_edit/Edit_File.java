@@ -42,7 +42,9 @@ public class Edit_File extends Fragment{
 	String tempfile = "lastplay";
 	FileOutputStream outputStream;
 
-
+	boolean settingsread = false;
+	String settings = "";
+	
 	OnHeadlineSelectedListener mCallback;
 
 	MainActivity main = new MainActivity();
@@ -95,7 +97,25 @@ public class Edit_File extends Fragment{
 			TextView filetext =(TextView) view.findViewById(R.id.filetext);
 			filetext.setText(result);
 
-
+			//read settings file
+			
+			FileInputStream fis2;
+			
+			try {
+				fis2 = ((MainActivity)getActivity()).openFileInput("settings");
+				byte[] input = new byte[fis2.available()];
+				while (fis2.read(input) != -1) {}
+				settings += new String(input);
+				settingsread = true;
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+			} catch (IOException e) {
+				e.printStackTrace(); 
+			}  
+			
+			
 		// set checkbox false
 		Button ReadWebPage = (Button)view.findViewById(R.id.letgo);
 		final CheckBox checkBox = (CheckBox) view.findViewById(R.id.defaultcheck);
@@ -111,12 +131,16 @@ public class Edit_File extends Fragment{
 
 				TextView defaultloc =(TextView) view.findViewById(R.id.defaultloc);
 				if (checkBox.isChecked()) {
-
-					defaultloc.setText(sdcard);
-					path = sdcard;
+					path = sdcard + "/Music";
+					defaultloc.setText(path);
+					
 				} else
 				{
-					path = "/storage/sdcard1/Music";
+					if (settingsread){
+						path = settings;
+					} else {
+						path = "/storage/sdcard1/Music";	
+					}
 					defaultloc.setText(path);
 				}
 			}
@@ -182,6 +206,7 @@ public class Edit_File extends Fragment{
 					catch (IOException e) {
 						strFilePath ="";
 						((MainActivity)getActivity()).createDialog("Error no such file or directory, try a different name or path", "Dismiss", "Error", true);
+						f.delete();
 						e.printStackTrace();
 					}
 					try{
@@ -244,6 +269,22 @@ public class Edit_File extends Fragment{
 			}
 		});
 
+		Button refresh = (Button) view.findViewById(R.id.refresh);
+		refresh.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				Intent refresh = new Intent(getActivity(), MainActivity.class);
+				startActivity(refresh);
+				
+			}
+			
+		});
+		
+		
+		
+		
+		
 		return view;
 	}
 

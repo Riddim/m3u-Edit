@@ -1,7 +1,7 @@
 package com.riddim.m3u_edit.adapter;
 
 import com.riddim.m3u_edit.Edit_File;
-import com.riddim.m3u_edit.See_File;
+import com.riddim.m3u_edit.Settings;
 import com.riddim.m3u_edit.Help_Me;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,7 +26,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter{
 			return new Edit_File();
 		case 2:
 			// Movies fragment activity
-			return new See_File();
+			return new Settings();
 		}
 
 		return null;
