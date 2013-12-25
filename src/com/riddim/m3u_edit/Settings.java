@@ -107,7 +107,17 @@ public class Settings extends ListFragment{
 					outputStream = ((Context)getActivity()).openFileOutput(tempfile, Context.MODE_PRIVATE);
 					outputStream.write(rpath.getBytes());
 					outputStream.close();
-					((MainActivity)getActivity()).createDialog("Default settingsFile created", "Proceed", "Succes", true);
+					((MainActivity)getActivity()).createDialog("Default settingsFile created", "Proceed", "Succes", false);
+					
+					((MainActivity)getActivity()).dialogButton.setOnClickListener(new OnClickListener(){
+						@Override
+						public void onClick(View v){
+				
+							Intent i = new Intent(getActivity(), MainActivity.class);
+							startActivity(i);
+						}
+					});	
+					
 				} catch (Exception e) {
 					((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
 					e.printStackTrace();
