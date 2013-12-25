@@ -76,13 +76,13 @@
         android:text="Full Screen" 
         android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/refresh"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="0dip"
-        android:layout_height="match_parent"
-        android:text="Refresh" 
-        android:layout_weight="1"/>
+<!--     <Button -->
+<!--         android:id="@+id/refresh" -->
+<!--         style="?android:attr/buttonStyleSmall" -->
+<!--         android:layout_width="0dip" -->
+<!--         android:layout_height="match_parent" -->
+<!--         android:text="Refresh"  -->
+<!--         android:layout_weight="1"/> -->
 
  </TableRow>
     <ScrollView

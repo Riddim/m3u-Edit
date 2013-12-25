@@ -74,11 +74,10 @@ public class Edit_File extends Fragment{
 		view = inflater.inflate(R.layout.edit_file, container, false);
 
 		TextView defaultloc =(TextView) view.findViewById(R.id.defaultloc);
-		path = "/storage/sdcard1/Music";
-		defaultloc.setText(path);
+		
 
 		//Read File internal file
-	
+/*	
 			FileInputStream fis;
 			String result = "";
 			try {
@@ -87,6 +86,7 @@ public class Edit_File extends Fragment{
 				while (fis.read(input) != -1) {}
 				result += new String(input);
 			} catch (FileNotFoundException e) {
+				((MainActivity)getActivity()).createDialog("No TempFile found", "Dismiss", "Error", true);
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace(); 
@@ -96,21 +96,30 @@ public class Edit_File extends Fragment{
 			// Set result
 			TextView filetext =(TextView) view.findViewById(R.id.filetext);
 			filetext.setText(result);
-
+*/
+		
 			//read settings file
 			
 			FileInputStream fis2;
 			
-			try {
+		try {
 				fis2 = ((MainActivity)getActivity()).openFileInput("settings");
 				byte[] input = new byte[fis2.available()];
 				while (fis2.read(input) != -1) {}
 				settings += new String(input);
 				settingsread = true;
 				
+				path = settings;
+				defaultloc.setText(path);
+				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+				path = "/storage/sdcard1/Music";
+				defaultloc.setText(path);
+				
+		
+				
 			} catch (IOException e) {
 				e.printStackTrace(); 
 			}  
@@ -254,7 +263,7 @@ public class Edit_File extends Fragment{
 
 
 				String string = encoded;
-
+/*
 				// make internal tempfile with encoded
 				try {
 					outputStream = ((Context)getActivity()).openFileOutput(tempfile, Context.MODE_PRIVATE);
@@ -263,23 +272,23 @@ public class Edit_File extends Fragment{
 				} catch (Exception e) {
 					((MainActivity)getActivity()).createDialog("No File created", "Dismiss", "Error", true);
 					e.printStackTrace();
-				}
+				}*/
 
 
 			}
 		});
-
-		Button refresh = (Button) view.findViewById(R.id.refresh);
-		refresh.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				Intent refresh = new Intent(getActivity(), MainActivity.class);
-				startActivity(refresh);
-				
-			}
-			
-		});
+//
+//		Button refresh = (Button) view.findViewById(R.id.refresh);
+//		refresh.setOnClickListener(new OnClickListener(){
+//
+//			@Override
+//			public void onClick(View v) {
+//				Intent refresh = new Intent(getActivity(), MainActivity.class);
+//				startActivity(refresh);
+//				
+//			}
+//			
+//		});
 		
 		
 		

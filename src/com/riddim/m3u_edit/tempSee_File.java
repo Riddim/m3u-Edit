@@ -33,7 +33,8 @@ public class tempSee_File extends Base {
 	    switch (item.getItemId()) {
 	    // Respond to the action bar's Up/Home button
 	    case android.R.id.home:
-	        NavUtils.navigateUpFromSameTask(this);
+	        //NavUtils.navigateUpFromSameTask(this);
+	    	finish();
 	        return true;
 	    }
 	    return super.onOptionsItemSelected(item);
