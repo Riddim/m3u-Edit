@@ -26,10 +26,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
-
-
-public class Settings extends ListFragment{
+public class Settings extends Fragment{
 
 	private List<String> item = null;
 	private List<String> path = null;
@@ -40,24 +37,151 @@ public class Settings extends ListFragment{
 	String tempfile = "settings";
 	FileOutputStream outputStream;
 
+	String browsepath;
+	String browse = "0";
+	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,	Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.settings, container, false);  
 
 		myPath = (TextView)view.findViewById(R.id.path);
 		root = Environment.getExternalStorageDirectory().getPath();
 		root = "/storage";
-		getDir(root);
+	//	getDir(root);
+
+		
+		//read files
+		FileInputStream fis2;
+
+		try {
+			fis2 = ((MainActivity)getActivity()).openFileInput("musicpath");
+			byte[] input = new byte[fis2.available()];
+			browsepath = "";
+			while (fis2.read(input) != -1) {}
+		
+			browsepath += new String(input);
+
+			TextView musicpath = (TextView) view.findViewById(R.id.musicpath);
+			musicpath.setText(browsepath);
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+
+		} catch (IOException e) {
+			e.printStackTrace(); 
+		}  
+	 
+		//read files
+		FileInputStream fis;
+
+		try {
+			fis = ((MainActivity)getActivity()).openFileInput("playpath");
+			byte[] input = new byte[fis.available()];
+			browsepath = "";
+			while (fis.read(input) != -1) {}
+		
+			browsepath += new String(input);
+
+			TextView playlistpath = (TextView) view.findViewById(R.id.playlistpath);
+			playlistpath.setText(browsepath);
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+
+		} catch (IOException e) {
+			e.printStackTrace(); 
+		}  
+		
+
+		
+		
+		
+		//read extra's
+				Bundle extras = getActivity().getIntent().getExtras();
+				if (extras != null) {
+					browse = extras.getString("browse");
+					browsepath = extras.getString("path");
+					if(browse == null || browsepath == null){
+						browse = "0";
+						browsepath = "";
+					}
+				}						
+				
+		if(browse.matches("1")){
+			TextView musicpath = (TextView) view.findViewById(R.id.musicpath);
+			musicpath.setText(browsepath);
+			
+			if(browse.equals("1")){
+				try {
+					outputStream = ((Context)getActivity()).openFileOutput("musicpath", Context.MODE_PRIVATE);
+					outputStream.write(browsepath.getBytes());
+					outputStream.close();
+					((MainActivity)getActivity()).createDialog("settingsFile(playlistpath) created", "Proceed", "Succes", true);
+					
+					
+				} catch (Exception e) {
+					((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		if(browse.matches("2")){
+			TextView playlistpath = (TextView) view.findViewById(R.id.playlistpath);
+			playlistpath.setText(browsepath);
+		
+			if ( browse.equals("2")){
+				try {
+					outputStream = ((Context)getActivity()).openFileOutput("playpath", Context.MODE_PRIVATE);
+					outputStream.write(browsepath.getBytes());
+					outputStream.close();
+					((MainActivity)getActivity()).createDialog("settingsFile(playlistpath) created", "Proceed", "Succes", true);
+					
+					
+				} catch (Exception e) {
+					((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
+					e.printStackTrace();
+				}
+			}
+			
+		}
+			
+		
+		Button musicbrowse = (Button) view.findViewById(R.id.browsemusic);
+		musicbrowse.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(getActivity(), FolderExplorer.class);
+			
+				intent.putExtra("browse", "1");
+				startActivity(intent);
+			
+			}
+		});
 
 
-
-		Button apply = (Button) view.findViewById(R.id.applysettings);
+		Button musicplay = (Button) view.findViewById(R.id.browseplay);
+		musicplay.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View arg0) {
+				Intent intent = new Intent(getActivity(), FolderExplorer.class);
+			
+				intent.putExtra("browse", "2");
+				startActivity(intent);
+			
+			}
+		});
+		
+		
+		/*Button apply = (Button) view.findViewById(R.id.applysettings);
 		apply.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View arg0) {
-				TextView newpath = (TextView) view.findViewById(R.id.changepath);
+				TextView newpath = (TextView) view.findViewById(R.id.musicpath);
 				String path;
 				if(newpath.getText().toString().isEmpty()){
 
@@ -69,33 +193,15 @@ public class Settings extends ListFragment{
 
 
 				//make temp file
-				try {
-					outputStream = ((Context)getActivity()).openFileOutput(tempfile, Context.MODE_PRIVATE);
-					outputStream.write(path.getBytes());
-					outputStream.close();
-					((MainActivity)getActivity()).createDialog("SettingsFile created, new path is: " + path, "Proceed", "Succes", false);
-					
-					((MainActivity)getActivity()).dialogButton.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v){
-				
-							Intent i = new Intent(getActivity(), MainActivity.class);
-							startActivity(i);
-						}
-					});
-					
-				} catch (Exception e) {
-					((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
-					e.printStackTrace();
-				}
+
 
 
 			}
 
 		});
+*/
 
-
-		Button reset = (Button) view.findViewById(R.id.resetsettings);
+		/*Button reset = (Button) view.findViewById(R.id.resetsettings);
 		reset.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -125,7 +231,7 @@ public class Settings extends ListFragment{
 
 			}
 
-		});
+		});*/
 
 
 
@@ -133,7 +239,9 @@ public class Settings extends ListFragment{
 
 	}
 
-	private void getDir(String dirPath)
+}
+	
+	/*private void getDir(String dirPath)
 	{
 		myPath.setText("Location: " + dirPath);
 		item = new ArrayList<String>();
@@ -197,7 +305,7 @@ public class Settings extends ListFragment{
 	}
 
 }
-
+*/
 
 
 

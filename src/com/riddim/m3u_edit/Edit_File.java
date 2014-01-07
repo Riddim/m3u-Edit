@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
@@ -37,6 +39,7 @@ public class Edit_File extends Fragment{
 	String replace;
 
 	String path;
+	String musicpath;
 	String encoded = "";
 
 	String tempfile = "lastplay";
@@ -44,7 +47,7 @@ public class Edit_File extends Fragment{
 
 	boolean settingsread = false;
 	String settings = "";
-	
+
 	OnHeadlineSelectedListener mCallback;
 
 	MainActivity main = new MainActivity();
@@ -74,59 +77,59 @@ public class Edit_File extends Fragment{
 		view = inflater.inflate(R.layout.edit_file, container, false);
 
 		TextView defaultloc =(TextView) view.findViewById(R.id.defaultloc);
-		
+
 
 		//Read File internal file
-/*	
+		
 			FileInputStream fis;
 			String result = "";
 			try {
-				fis = ((MainActivity)getActivity()).openFileInput(tempfile);
+				fis = ((MainActivity)getActivity()).openFileInput("musicpath");
 				byte[] input = new byte[fis.available()];
 				while (fis.read(input) != -1) {}
-				result += new String(input);
+				musicpath = "";
+				musicpath += new String(input);
+				
+				
 			} catch (FileNotFoundException e) {
-				((MainActivity)getActivity()).createDialog("No TempFile found", "Dismiss", "Error", true);
+				((MainActivity)getActivity()).createDialog("No Musicfolder found, go to settings!", "Dismiss", "Error", true);
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace(); 
 			}  
 
 
-			// Set result
-			TextView filetext =(TextView) view.findViewById(R.id.filetext);
-			filetext.setText(result);
-*/
 		
-			//read settings file
-			
-			FileInputStream fis2;
-			
+
+		//read settings file
+
+		FileInputStream fis2;
+
 		try {
-				fis2 = ((MainActivity)getActivity()).openFileInput("settings");
-				byte[] input = new byte[fis2.available()];
-				while (fis2.read(input) != -1) {}
-				settings += new String(input);
-				settingsread = true;
-				
-				path = settings;
-				defaultloc.setText(path);
-				
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
-				path = "/storage/sdcard1/Music";
-				defaultloc.setText(path);
-				
-		
-				
-			} catch (IOException e) {
-				e.printStackTrace(); 
-			}  
-			
-			
+			fis2 = ((MainActivity)getActivity()).openFileInput("playpath");
+			byte[] input = new byte[fis2.available()];
+			while (fis2.read(input) != -1) {}
+			settings += new String(input);
+			settingsread = true;
+
+			path = settings;
+			defaultloc.setText(path);
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+			path = "/storage/sdcard1/Music";
+			defaultloc.setText(path);
+
+
+
+		} catch (IOException e) {
+			e.printStackTrace(); 
+		}  
+
+
 		// set checkbox false
-		Button ReadWebPage = (Button)view.findViewById(R.id.letgo);
+		
 		final CheckBox checkBox = (CheckBox) view.findViewById(R.id.defaultcheck);
 		if (checkBox.isChecked()) {
 			checkBox.setChecked(false);
@@ -142,7 +145,7 @@ public class Edit_File extends Fragment{
 				if (checkBox.isChecked()) {
 					path = sdcard + "/Music";
 					defaultloc.setText(path);
-					
+
 				} else
 				{
 					if (settingsread){
@@ -154,6 +157,19 @@ public class Edit_File extends Fragment{
 				}
 			}
 		});
+
+		//read extra's
+		
+		Bundle extras = ((MainActivity)getActivity()).getIntent().getExtras();
+		if (extras != null) {
+			String value = extras.getString("playpath");
+			EditText loc = (EditText) view.findViewById(R.id.locFile);
+			if(value != null){
+				loc.setText(value);
+				Edit(false);
+			}
+			
+		}
 
 		Button fullScreen = (Button) view.findViewById(R.id.fullscreen);
 		fullScreen.setOnClickListener(new OnClickListener(){
@@ -168,134 +184,135 @@ public class Edit_File extends Fragment{
 
 		});
 
-		ReadWebPage.setOnClickListener(new OnClickListener(){
+		Button browse = (Button) view.findViewById(R.id.browseedit);
+		browse.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
-				Boolean access = isExternalStorageWritable();
-				//	TextView Show = (TextView) view.findViewById(R.id.show);
-
-				encoded = "";
-
-				if(access){
-					String strFilePath;
-					TextView FilePath = (TextView) view.findViewById(R.id.locFile);
-					strFilePath = FilePath.getText().toString();
-
-					File myDir = new File(path);    
-					myDir.mkdirs();
-
-					//		strFilePath = "playlistorgr.m3u";
-
-					File f = new File (myDir, strFilePath);
-
-					StringBuffer sb = new StringBuffer();
-
-					DefaultProg();
-
-					//	Show.setText(strFilePath + "\n" + lineChange + "\n" + replace + "\n" + access);			
-
-					try {
-						BufferedReader br = new BufferedReader(new FileReader(f));
-						String line;
-
-						while(true)
-						{
-							line=br.readLine();
-							if(line==null)
-								break;
-							sb.append(line + "\n");				 					    
-
-							int cnt1 = sb.indexOf(lineChange);
-							if (cnt1 >= 0){
-								sb.replace(cnt1,cnt1+lineChange.length(), replace);
-							}
-						}
-						br.close();
-					}
-					catch (IOException e) {
-						strFilePath ="";
-						((MainActivity)getActivity()).createDialog("Error no such file or directory, try a different name or path", "Dismiss", "Error", true);
-						f.delete();
-						e.printStackTrace();
-					}
-					try{
-						FileWriter fstream = new FileWriter(f);
-						BufferedWriter outobj = new BufferedWriter(fstream);
-						outobj.write(sb.toString());
-						outobj.close();
-
-					}catch (Exception e){
-						System.err.println("Error: " + e.getMessage());
-
-					}
-
-					try {
-						final BufferedReader reader = new BufferedReader(new FileReader(f));
-
-						try {
-							String line;
-							while ((line = reader.readLine()) != null) {
-								encoded += (line + "\n");
-							}
-						}
-						finally {
-							reader.close();
-						}
-						System.out.print(encoded);
-
-						TextView filetext =(TextView) view.findViewById(R.id.filetext);
-						filetext.setText(encoded);
-
-						mCallback.onArticleSelected(encoded);
-
-
-					} catch (IOException e) {
-
-						e.printStackTrace();
-					}
-				}
-				else{
-					//	Show.setText("Error no access to sd card");		
-
-					main.createDialog("Error no access to sd card", "Ok", "Error", true);
-				}
-
-
-
-				String string = encoded;
-/*
-				// make internal tempfile with encoded
-				try {
-					outputStream = ((Context)getActivity()).openFileOutput(tempfile, Context.MODE_PRIVATE);
-					outputStream.write(string.getBytes());
-					outputStream.close();
-				} catch (Exception e) {
-					((MainActivity)getActivity()).createDialog("No File created", "Dismiss", "Error", true);
-					e.printStackTrace();
-				}*/
-
-
+				Intent intent = new Intent(getActivity(), Explorer.class);
+				intent.putExtra("the path", path);
+				startActivity(intent);
 			}
 		});
-//
-//		Button refresh = (Button) view.findViewById(R.id.refresh);
-//		refresh.setOnClickListener(new OnClickListener(){
-//
-//			@Override
-//			public void onClick(View v) {
-//				Intent refresh = new Intent(getActivity(), MainActivity.class);
-//				startActivity(refresh);
-//				
-//			}
-//			
-//		});
-		
-		
-		
-		
-		
+
+		Button letgo = (Button) view.findViewById(R.id.letgo);
+		letgo.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View arg0) {
+
+				Edit(false);
+			}
+		});
+
+		Button autoedit = (Button) view.findViewById(R.id.autoedit);
+		autoedit.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View arg0) {
+
+				Edit(true);
+			}
+		});
+
 		return view;
 	}
+
+
+	public void Edit(boolean auto){
+
+		Boolean access = isExternalStorageWritable();
+
+		encoded = "";
+
+		if(access){
+			String strFilePath;
+			TextView FilePath = (TextView) view.findViewById(R.id.locFile);
+			strFilePath = FilePath.getText().toString();
+
+			File myDir = new File(path);    
+			myDir.mkdirs();
+
+			File f = new File (myDir, strFilePath);
+
+			StringBuffer sb = new StringBuffer();
+
+			DefaultProg();
+
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(f));
+				String line;
+				String replauto;
+				replauto = (musicpath + "/");
+				while(true)
+				{
+					line=br.readLine();
+					
+					if(line==null)
+						break;
+					sb.append(line + "\n");				 					    
+
+					if(!auto){
+						int cnt1 = sb.indexOf(lineChange);
+						if (cnt1 >= 0){
+							sb.replace(cnt1,cnt1+lineChange.length(), replace);
+						}
+					}
+					else {
+						int last = sb.lastIndexOf("\\");
+						int del = line.lastIndexOf("\\");
+						if(last >= 0 && del >=0){
+							
+						sb.replace(last - del, last + 1 , replauto);
+						}
+					}
+
+				}
+				br.close();
+			}
+			catch (IOException e) {
+				strFilePath ="";
+				((MainActivity)getActivity()).createDialog("Error no such file or directory, try a different name or path", "Dismiss", "Error", true);
+				f.delete();
+				e.printStackTrace();
+			}
+			try{
+				FileWriter fstream = new FileWriter(f);
+				BufferedWriter outobj = new BufferedWriter(fstream);
+				outobj.write(sb.toString());
+				outobj.close();
+
+			}catch (Exception e){
+				System.err.println("Error: " + e.getMessage());
+
+			}
+
+			try {
+				final BufferedReader reader = new BufferedReader(new FileReader(f));
+
+				try {
+					String line;
+					while ((line = reader.readLine()) != null) {
+						encoded += (line + "\n");
+					}
+				}
+				finally {
+					reader.close();
+				}
+
+				TextView filetext =(TextView) view.findViewById(R.id.filetext);
+				filetext.setText(encoded);
+
+				mCallback.onArticleSelected(encoded);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else{	
+
+			main.createDialog("Error no access to sd card", "Ok", "Error", true);
+		}
+	}
+
+
 
 	// read user input
 	public String DefaultProg(){	

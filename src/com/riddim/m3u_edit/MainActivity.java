@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.widget.EditText;
 
 public class MainActivity extends Base implements ActionBar.TabListener, Edit_File.OnHeadlineSelectedListener{
  
@@ -77,6 +78,20 @@ public class MainActivity extends Base implements ActionBar.TabListener, Edit_Fi
 			}
 		});
 		viewPager.setCurrentItem(1);
+		
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			String value = extras.getString("playpath");
+			if(value == null){
+				viewPager.setCurrentItem(2);
+			} 
+			
+		} else {
+			viewPager.setCurrentItem(1);
+		}
+		
+		
+		
 	}
 
 	@Override

@@ -3,36 +3,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
- <TableRow  >
+    <TableRow>
 
-    <CheckBox
-        android:id="@+id/defaultcheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Use default location:" />
+        <CheckBox
+            android:id="@+id/defaultcheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Default loc:" />
 
-    <TextView
-        android:id="@+id/defaultloc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" 
-        android:gravity="right"/>
+        <TextView
+            android:id="@+id/defaultloc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="TextView" />
+    </TableRow>
 
-</TableRow>
     <TextView
         android:id="@+id/content2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Type file name + extension" />
 
-    <EditText
-        android:id="@+id/locFile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10" >
+    <TableRow>
 
-        <requestFocus />
-    </EditText>
+        <EditText
+            android:id="@+id/locFile"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:ems="10" 
+            android:layout_weight="3">
+        </EditText>
+
+        <Button
+            android:id="@+id/browseedit"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Browse" />
+
+    </TableRow>
 
     <TextView
         android:id="@+id/textView2"
@@ -58,33 +69,36 @@
         android:layout_height="wrap_content"
         android:ems="10" />
 
- <TableRow android:gravity="center_horizontal" >
+   <TableRow> 
 
-    <Button
-        android:id="@+id/letgo"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="0dip"
-        android:layout_height="match_parent"
-        android:text="Let go" 
-        android:layout_weight="2"/>
+        <Button
+            android:id="@+id/letgo"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Let go" />
 
-    <Button
-        android:id="@+id/fullscreen"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="0dip"
-        android:layout_height="match_parent"
-        android:text="Full Screen" 
-        android:layout_weight="1"/>
+        <Button
+            android:id="@+id/autoedit"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+             android:layout_weight="1"
+            android:text="Auto Edit" />
 
-<!--     <Button -->
-<!--         android:id="@+id/refresh" -->
-<!--         style="?android:attr/buttonStyleSmall" -->
-<!--         android:layout_width="0dip" -->
-<!--         android:layout_height="match_parent" -->
-<!--         android:text="Refresh"  -->
-<!--         android:layout_weight="1"/> -->
+        <Button
+            android:id="@+id/fullscreen"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Full Screen" />
 
- </TableRow>
+
+
+    </TableRow>
+
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="wrap_content"
@@ -100,7 +114,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="FileContent" />
-
         </LinearLayout>
     </ScrollView>
 
