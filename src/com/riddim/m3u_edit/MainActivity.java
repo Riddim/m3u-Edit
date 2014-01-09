@@ -77,7 +77,7 @@ public class MainActivity extends Base implements ActionBar.TabListener, Edit_Fi
 			       actionBar.setSelectedNavigationItem(position);
 			}
 		});
-		viewPager.setCurrentItem(1);
+		viewPager.setCurrentItem(0);
 		
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -85,9 +85,12 @@ public class MainActivity extends Base implements ActionBar.TabListener, Edit_Fi
 			if(value == null){
 				viewPager.setCurrentItem(3);
 			} 
-			
+			String value2 = extras.getString("filepath");
+			if(value2 != null){
+				viewPager.setCurrentItem(1);
+			}
 		} else {
-			viewPager.setCurrentItem(1);
+			viewPager.setCurrentItem(0);
 		}
 		
 		

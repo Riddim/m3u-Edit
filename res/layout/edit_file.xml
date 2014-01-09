@@ -23,7 +23,7 @@
         android:id="@+id/content2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Type file name + extension" />
+        android:text="Open playlist file with Browse" />
 
     <TableRow>
 
@@ -46,14 +46,14 @@
 
 
     <TableRow>
-
+<!-- 
         <Button
             android:id="@+id/letgo"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Let go" />
+            android:text="Let go" /> -->
 
         <Button
             android:id="@+id/autoedit"
@@ -73,7 +73,7 @@
     </TableRow>
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

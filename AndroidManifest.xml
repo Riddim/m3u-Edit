@@ -36,7 +36,7 @@
             android:parentActivityName="com.riddim.m3u_edit.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.riddim.m3u_edit.MainActivity" />
+                android:value="com.riddim.m3u_edit.MainActivity"  />
         </activity>
         
         <activity

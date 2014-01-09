@@ -8,10 +8,10 @@
     
      <string name="help">Use the format m3u.\n
 Now put the m3u file in your playlist folder of your device, or where ever you like. The playlist will not work ,because the paths to the file are wrong. The paths where made by the pc program playlist creator.\n
-To fix this we need to edit the file.\n
+To fix this we need to edit the file.\n\n
 IMPORTANT:\n
-All music on your device has to be in one folder.\n
-In SETTINGS your musicfolder needs to be set!\n\n
+1. All music on your device has to be in one folder.\n
+2. In SETTINGS your musicfolder needs to be set!\n\n
 
 Now open your playlist by browsing and then hit OK. The playlist is loaded and will probably look something like this:\n\n
 

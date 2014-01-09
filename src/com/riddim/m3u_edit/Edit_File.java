@@ -10,54 +10,44 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
-import com.riddim.m3u_edit.R;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class Edit_File extends ListFragment{
+public class Edit_File extends Fragment{
 	View  view;
-
 	String lineChange = "";
 	String replace = "";
-
 	String notExist = "";
-
 	String path;
 	String musicpath;
 	String encoded = "";
-
 	String tempfile = "lastplay";
 	FileOutputStream outputStream;
-
 	boolean settingsread = false;
 	String settings = "";
-
 	ArrayList<String> mp3String = null;
-
 	OnHeadlineSelectedListener mCallback;
-
 	MainActivity main = new MainActivity();
-
-
-
-
+	int count = 0;
+	
 	// Container Activity must implement this interface
 	public interface OnHeadlineSelectedListener {
 		public void onArticleSelected(String encoded);
@@ -76,7 +66,6 @@ public class Edit_File extends ListFragment{
 					+ " must implement OnHeadlineSelectedListener");
 		}
 	}
-
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -126,8 +115,6 @@ public class Edit_File extends ListFragment{
 			((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
 			path = "/storage/sdcard1/Music";
 			defaultloc.setText(path);
-
-
 
 		} catch (IOException e) {
 			e.printStackTrace(); 
@@ -208,14 +195,14 @@ public class Edit_File extends ListFragment{
 			}
 		});
 
-		Button letgo = (Button) view.findViewById(R.id.letgo);
+		/*		Button letgo = (Button) view.findViewById(R.id.letgo);
 		letgo.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
 
 				Edit(false);
 			}
-		});
+		});*/
 
 		Button autoedit = (Button) view.findViewById(R.id.autoedit);
 		autoedit.setOnClickListener(new OnClickListener(){
@@ -229,40 +216,31 @@ public class Edit_File extends ListFragment{
 	}
 
 	public void Edit(boolean auto){
-
 		Boolean access = isExternalStorageWritable();
-
 		encoded = "";
-
+		notExist = "";
 		if(access){
 			String strFilePath;
 			TextView FilePath = (TextView) view.findViewById(R.id.locFile);
 			strFilePath = FilePath.getText().toString();
-
 			File myDir = new File(path);    
 			myDir.mkdirs();
-
 			File f = new File (myDir, strFilePath);
-
 			StringBuffer sb = new StringBuffer();
-
 			mp3String = new ArrayList<String>();
-
-			//	DefaultProg();
 
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(f));
 				String line;
 				String replauto;
+				
 				replauto = (musicpath + "/");
 				while(true)
 				{
 					line=br.readLine();
-
 					if(line==null)
 						break;
 					sb.append(line + "\n");				 					    
-
 					if(!auto){
 						int cnt1 = sb.indexOf(lineChange);
 						if (cnt1 >= 0){
@@ -272,14 +250,14 @@ public class Edit_File extends ListFragment{
 					else {
 						int last = sb.lastIndexOf("\\");
 						int del = line.lastIndexOf("\\");
-						if(last >= 0 && del >=0){
-
+						if(last >= 0 && del >=0)
+						{
 							sb.replace(last - del, last + 1 , replauto);
 						}
 						int last2 = sb.lastIndexOf("/");
 						int del2 = line.lastIndexOf("/");
-						if(last2 >= 0 && del2 >=0){
-
+						if(last2 >= 0 && del2 >=0)
+						{
 							sb.replace(last2 - del2, last2 + 1 , replauto);
 						}
 					}
@@ -288,7 +266,6 @@ public class Edit_File extends ListFragment{
 				if(auto){
 					((MainActivity)getActivity()).createDialog("Auto Edit completed! New path: " + replauto, "Ok", "NICE", true);
 				}
-
 			}
 			catch (IOException e) {
 				strFilePath ="";
@@ -305,7 +282,7 @@ public class Edit_File extends ListFragment{
 			}catch (Exception e){
 				System.err.println("Error: " + e.getMessage());
 			}
-			
+
 			try {
 				final BufferedReader reader = new BufferedReader(new FileReader(f));
 
@@ -314,6 +291,7 @@ public class Edit_File extends ListFragment{
 					String line;
 					String mp3block =  "";
 					while ((line = reader.readLine()) != null) {
+						
 						if(line.equals("#EXTM3U")){
 							mp3String.add(line);
 
@@ -330,32 +308,43 @@ public class Edit_File extends ListFragment{
 									mp3block = "";
 								}
 								else {
-									notExist += (line + "\n");
+
+									mp3block += line;
+									mp3String.add(mp3block);
+									count++;
+									notExist += (mp3block + "\n"); 
+									mp3block = "";
 								}
 							}
 						}
 						encoded += (line + "\n");
 					}
 					if(!notExist.equals("")){
-						((MainActivity)getActivity()).createDialog("Did not exist:\n" + notExist, "Dismiss", "Error Paths wrong", true);
-						notExist = "";
+						if(count<5){
+							
+							((MainActivity)getActivity()).createDialog("Did not exist:\n" + notExist, "Dismiss", "Error", true);
+						} else {
+							((MainActivity)getActivity()).createDialog("A lot of wrong paths, check the crosses XD", "Dismiss", "Error", true);
+						}
+						count =0;
+						
 					}
-
 				}
 				finally {
 
 					reader.close();
 				}
+				populateListview();
 
-				ArrayAdapter<String> listmp3 =
-						new ArrayAdapter<String>(getActivity(), R.layout.row2, mp3String);
-				setListAdapter(listmp3); 
+				
 
-				//	TextView filetext =(TextView) view.findViewById(R.id.filetext);
-				//filetext.setText(encoded);
+				//	ArrayAdapter<String> listmp3 =
+				//			new ArrayAdapter<String>(getActivity(), R.layout.row2, mp3String);
+				//	setListAdapter(listmp3); 
 
 				mCallback.onArticleSelected(encoded);
-
+				
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -367,6 +356,45 @@ public class Edit_File extends ListFragment{
 	}
 
 
+
+	private void populateListview() {
+		ArrayAdapter<String> adapter = new MyListAdapter();
+		ListView list = (ListView) view.findViewById(R.id.list);
+		list.setAdapter(adapter);
+	}
+
+	private class MyListAdapter extends ArrayAdapter<String> {
+		public MyListAdapter(){
+			super(getActivity(), R.layout.row2, mp3String);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View itemView = convertView;
+			if(itemView == null){
+				itemView = ((MainActivity)getActivity()).getLayoutInflater().inflate(R.layout.row2, parent, false);
+			}
+			String current = mp3String.get(position);
+
+			if(position == 0){
+
+				ImageView imageView = (ImageView) itemView.findViewById(R.id.vink);
+				imageView.setImageDrawable(null);
+			} else {
+				if(notExist.contains(current)){
+					ImageView imageView = (ImageView) itemView.findViewById(R.id.vink);
+					imageView.setImageResource(R.drawable.cross);
+				} else {
+					ImageView imageView = (ImageView) itemView.findViewById(R.id.vink);
+					imageView.setImageResource(R.drawable.vinkje);
+				}
+			}
+			TextView txt = (TextView) itemView.findViewById(R.id.rowtext);
+			txt.setText(mp3String.get(position));
+
+			return itemView;
+		}
+	}
 
 	/*
 	// read user input
@@ -392,4 +420,9 @@ public class Edit_File extends ListFragment{
 		return false;
 	}
 
+
+
+
+
 }
+
