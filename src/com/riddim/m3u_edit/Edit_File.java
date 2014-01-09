@@ -37,6 +37,8 @@ public class Edit_File extends ListFragment{
 	String lineChange = "";
 	String replace = "";
 
+	String notExist = "";
+
 	String path;
 	String musicpath;
 	String encoded = "";
@@ -302,9 +304,8 @@ public class Edit_File extends ListFragment{
 
 			}catch (Exception e){
 				System.err.println("Error: " + e.getMessage());
-
 			}
-
+			
 			try {
 				final BufferedReader reader = new BufferedReader(new FileReader(f));
 
@@ -315,26 +316,31 @@ public class Edit_File extends ListFragment{
 					while ((line = reader.readLine()) != null) {
 						if(line.equals("#EXTM3U")){
 							mp3String.add(line);
-							
+
 						} else {
-						if(!line.endsWith(".mp3")){
-							mp3block += (line + "\n");
-						}	
-						else {
-							File file = new File(line);
-							if(file.exists())  {
-							
-							mp3block += line;
-							mp3String.add(mp3block);
-							mp3block = "";
-							}
+							if(!line.endsWith(".mp3")){
+								mp3block += (line + "\n");
+							}	
 							else {
-								((MainActivity)getActivity()).createDialog("Did not exist: " + line, "Dismiss", "Error", true);
+								File file = new File(line);
+								if(file.exists())  {
+
+									mp3block += line;
+									mp3String.add(mp3block);
+									mp3block = "";
+								}
+								else {
+									notExist += (line + "\n");
+								}
 							}
 						}
-					}
 						encoded += (line + "\n");
 					}
+					if(!notExist.equals("")){
+						((MainActivity)getActivity()).createDialog("Did not exist:\n" + notExist, "Dismiss", "Error Paths wrong", true);
+						notExist = "";
+					}
+
 				}
 				finally {
 
