@@ -21,7 +21,7 @@ public class MainActivity extends Base implements ActionBar.TabListener, Edit_Fi
 	private TabsPagerAdapter mAdapter;
 	private ActionBar actionBar;
 	// Tab titles
-	private String[] tabs = { "Help Me", "Edit File", "Settings" };
+	private String[] tabs = { "Help Me", "Edit File","New M3U","Settings" };
 			
 	Fragment see = new Settings();
 	
@@ -83,7 +83,7 @@ public class MainActivity extends Base implements ActionBar.TabListener, Edit_Fi
 		if (extras != null) {
 			String value = extras.getString("playpath");
 			if(value == null){
-				viewPager.setCurrentItem(2);
+				viewPager.setCurrentItem(3);
 			} 
 			
 		} else {

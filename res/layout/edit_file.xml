@@ -31,8 +31,8 @@
             android:id="@+id/locFile"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:ems="10" 
-            android:layout_weight="3">
+            android:layout_weight="3"
+            android:ems="10" >
         </EditText>
 
         <Button
@@ -42,34 +42,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Browse" />
-
     </TableRow>
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="The text to replace:" />
 
-    <EditText
-        android:id="@+id/replace"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="With the following text:" />
-
-    <EditText
-        android:id="@+id/replacewith"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10" />
-
-   <TableRow> 
+    <TableRow>
 
         <Button
             android:id="@+id/letgo"
@@ -84,7 +60,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-             android:layout_weight="1"
+            android:layout_weight="1"
             android:text="Auto Edit" />
 
         <Button
@@ -94,27 +70,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Full Screen" />
-
-
-
     </TableRow>
 
-    <ScrollView
-        android:id="@+id/scrollView1"
+    <ListView
+        android:id="@android:id/list"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/filetext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="FileContent" />
-        </LinearLayout>
-    </ScrollView>
+    <ListView>
+    </ListView>
 
 </TableLayout>

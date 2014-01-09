@@ -1,5 +1,8 @@
 package com.riddim.m3u_edit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,9 +22,12 @@ public class tempSee_File extends Base {
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		
 		
+		
 		TextView content = (TextView) findViewById(R.id.content2);
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
+			
+			
 		    String value = extras.getString("text");
 		    content.setText(value);
 		}

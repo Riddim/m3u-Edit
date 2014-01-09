@@ -5,4 +5,34 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 
+    
+     <string name="help">Use the format m3u.\n
+Now put the m3u file in your playlist folder of your device, or where ever you like. The playlist will not work ,because the paths to the file are wrong. The paths where made by the pc program playlist creator.\n
+To fix this we need to edit the file.\n
+IMPORTANT:\n
+All music on your device has to be in one folder.\n
+In SETTINGS your musicfolder needs to be set!\n\n
+
+Now open your playlist by browsing and then hit OK. The playlist is loaded and will probably look something like this:\n\n
+
+#EXTM3U\n
+#EXTINF:295,PrimeMusic.ru November 2013 - 1 - Direct Dizko (Original Mix) (PrimeMusic.ru)\n
+\\\\DS2\music\\playlist luuk\\Sander Van Doorn and Yves V - Direct Dizko (Original Mix).mp3\n
+#EXTINF:243, -  - Revolution (Instrumental Mix)\n
+\\\\DS2\\music\\playlist luuk\\R3hab, Nervo, Ummet Ozcan - Revolution (Instrumental Mix).mp3\n
+#EXTINF:248, -  - R3HAB  - I NEED R3HAB 060\n
+\\\\DS2\\music\\playlist luuk\\Syn Cole - Miami 82 (Avicii Edit).mp3\n\n
+
+This needs to be changed to something with a proper path. Now all you have to is hit auto edit, after you set the musicfolder in settings!\n
+The result will look like:\n\n
+
+#EXTM3U\n
+#EXTINF:295,PrimeMusic.ru November 2013 - 1 - Direct Dizko (Original Mix) (PrimeMusic.ru)\n
+/storage/sdcard1/Music/Sander Van Doorn and Yves V - Direct Dizko (Original Mix).mp3\n
+#EXTINF:243, -  - Revolution (Instrumental Mix)\n
+/storage/sdcard1/Music/R3hab, Nervo, Ummet Ozcan - Revolution (Instrumental Mix).mp3\n
+#EXTINF:248, -  - R3HAB  - I NEED R3HAB 060\n
+/storage/sdcard1/Music/Syn Cole - Miami 82 (Avicii Edit).mp3\n\n
+</string>
+    
 </resources>

@@ -9,20 +9,21 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.riddim.m3u_edit.R;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -30,13 +31,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-import com.riddim.m3u_edit.Base;
-
-public class Edit_File extends Fragment{
+public class Edit_File extends ListFragment{
 	View  view;
 
-	String lineChange;
-	String replace;
+	String lineChange = "";
+	String replace = "";
 
 	String path;
 	String musicpath;
@@ -48,9 +47,14 @@ public class Edit_File extends Fragment{
 	boolean settingsread = false;
 	String settings = "";
 
+	ArrayList<String> mp3String = null;
+
 	OnHeadlineSelectedListener mCallback;
 
 	MainActivity main = new MainActivity();
+
+
+
 
 	// Container Activity must implement this interface
 	public interface OnHeadlineSelectedListener {
@@ -80,26 +84,26 @@ public class Edit_File extends Fragment{
 
 
 		//Read File internal file
-		
-			FileInputStream fis;
-			String result = "";
-			try {
-				fis = ((MainActivity)getActivity()).openFileInput("musicpath");
-				byte[] input = new byte[fis.available()];
-				while (fis.read(input) != -1) {}
-				musicpath = "";
-				musicpath += new String(input);
-				
-				
-			} catch (FileNotFoundException e) {
-				((MainActivity)getActivity()).createDialog("No Musicfolder found, go to settings!", "Dismiss", "Error", true);
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace(); 
-			}  
+
+		FileInputStream fis;
+		String result = "";
+		try {
+			fis = ((MainActivity)getActivity()).openFileInput("musicpath");
+			byte[] input = new byte[fis.available()];
+			while (fis.read(input) != -1) {}
+			musicpath = "";
+			musicpath += new String(input);
 
 
-		
+		} catch (FileNotFoundException e) {
+			((MainActivity)getActivity()).createDialog("No Musicfolder found, go to settings!", "Dismiss", "Error", true);
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace(); 
+		}  
+
+
+
 
 		//read settings file
 
@@ -129,7 +133,7 @@ public class Edit_File extends Fragment{
 
 
 		// set checkbox false
-		
+
 		final CheckBox checkBox = (CheckBox) view.findViewById(R.id.defaultcheck);
 		if (checkBox.isChecked()) {
 			checkBox.setChecked(false);
@@ -159,16 +163,23 @@ public class Edit_File extends Fragment{
 		});
 
 		//read extra's
-		
+
 		Bundle extras = ((MainActivity)getActivity()).getIntent().getExtras();
 		if (extras != null) {
 			String value = extras.getString("playpath");
+
 			EditText loc = (EditText) view.findViewById(R.id.locFile);
 			if(value != null){
 				loc.setText(value);
+
+				if(extras.getString("filepath") != null){
+					path = extras.getString("filepath");
+				}
+
+				defaultloc.setText(path);
 				Edit(false);
 			}
-			
+
 		}
 
 		Button fullScreen = (Button) view.findViewById(R.id.fullscreen);
@@ -177,6 +188,7 @@ public class Edit_File extends Fragment{
 			@Override
 			public void onClick(View arg0) {
 				Intent intent = new Intent(getActivity(), tempSee_File.class);
+				//intent.putStringArrayListExtra("data", mp3String);
 				intent.putExtra("text", encoded);
 				startActivity(intent);
 
@@ -211,10 +223,8 @@ public class Edit_File extends Fragment{
 				Edit(true);
 			}
 		});
-
 		return view;
 	}
-
 
 	public void Edit(boolean auto){
 
@@ -234,7 +244,9 @@ public class Edit_File extends Fragment{
 
 			StringBuffer sb = new StringBuffer();
 
-			DefaultProg();
+			mp3String = new ArrayList<String>();
+
+			//	DefaultProg();
 
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(f));
@@ -244,7 +256,7 @@ public class Edit_File extends Fragment{
 				while(true)
 				{
 					line=br.readLine();
-					
+
 					if(line==null)
 						break;
 					sb.append(line + "\n");				 					    
@@ -259,13 +271,22 @@ public class Edit_File extends Fragment{
 						int last = sb.lastIndexOf("\\");
 						int del = line.lastIndexOf("\\");
 						if(last >= 0 && del >=0){
-							
-						sb.replace(last - del, last + 1 , replauto);
+
+							sb.replace(last - del, last + 1 , replauto);
+						}
+						int last2 = sb.lastIndexOf("/");
+						int del2 = line.lastIndexOf("/");
+						if(last2 >= 0 && del2 >=0){
+
+							sb.replace(last2 - del2, last2 + 1 , replauto);
 						}
 					}
-
 				}
 				br.close();
+				if(auto){
+					((MainActivity)getActivity()).createDialog("Auto Edit completed! New path: " + replauto, "Ok", "NICE", true);
+				}
+
 			}
 			catch (IOException e) {
 				strFilePath ="";
@@ -287,18 +308,45 @@ public class Edit_File extends Fragment{
 			try {
 				final BufferedReader reader = new BufferedReader(new FileReader(f));
 
+
 				try {
 					String line;
+					String mp3block =  "";
 					while ((line = reader.readLine()) != null) {
+						if(line.equals("#EXTM3U")){
+							mp3String.add(line);
+							
+						} else {
+						if(!line.endsWith(".mp3")){
+							mp3block += (line + "\n");
+						}	
+						else {
+							File file = new File(line);
+							if(file.exists())  {
+							
+							mp3block += line;
+							mp3String.add(mp3block);
+							mp3block = "";
+							}
+							else {
+								((MainActivity)getActivity()).createDialog("Did not exist: " + line, "Dismiss", "Error", true);
+							}
+						}
+					}
 						encoded += (line + "\n");
 					}
 				}
 				finally {
+
 					reader.close();
 				}
 
-				TextView filetext =(TextView) view.findViewById(R.id.filetext);
-				filetext.setText(encoded);
+				ArrayAdapter<String> listmp3 =
+						new ArrayAdapter<String>(getActivity(), R.layout.row2, mp3String);
+				setListAdapter(listmp3); 
+
+				//	TextView filetext =(TextView) view.findViewById(R.id.filetext);
+				//filetext.setText(encoded);
 
 				mCallback.onArticleSelected(encoded);
 
@@ -314,6 +362,7 @@ public class Edit_File extends Fragment{
 
 
 
+	/*
 	// read user input
 	public String DefaultProg(){	
 		TextView Change =(TextView) view.findViewById(R.id.replace);
@@ -324,6 +373,9 @@ public class Edit_File extends Fragment{
 
 		return lineChange + replace;
 	}
+	 */
+
+
 
 	// check external storage 
 	public boolean isExternalStorageWritable() {

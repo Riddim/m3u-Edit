@@ -32,6 +32,7 @@ public class FolderExplorer extends ListActivity {
 	private List<String> path = null;
 	private String root;
 	private TextView myPath;
+	private String pathNow = "";
 	String stPath;
 	String playpath;
 	boolean m3u, pls, mp3;
@@ -43,6 +44,11 @@ public class FolderExplorer extends ListActivity {
 		setContentView(R.layout.folderexplorer);
 		myPath = (TextView) findViewById(R.id.path);
 
+		if(pathNow.equals("")){
+			pathNow = root;
+		}
+		
+		
 		// set checkbox 
 		final CheckBox checkm3u = (CheckBox) findViewById(R.id.checkm3u);
 		if (!checkm3u.isChecked()) {
@@ -73,6 +79,8 @@ public class FolderExplorer extends ListActivity {
 		}
 		if(browse.equals("1")){
 			m3u = false; pls = false; mp3 = true;
+			checkm3u.setChecked(false);
+			checkmp3.setChecked(true);
 		} else {
 			m3u = true; pls = false; mp3 = false;
 		}
@@ -89,7 +97,7 @@ public class FolderExplorer extends ListActivity {
 				} else{
 					m3u = false;	
 				}
-				getDir(root, m3u, pls, mp3);
+				getDir(pathNow, m3u, pls, mp3);
 			}
 		});
 
@@ -102,7 +110,7 @@ public class FolderExplorer extends ListActivity {
 				} else{
 					pls = false;
 				}
-				getDir(root, m3u, pls, mp3);
+				getDir(pathNow, m3u, pls, mp3);
 			}
 		});
 
@@ -116,7 +124,7 @@ public class FolderExplorer extends ListActivity {
 				} else{
 					mp3 = false;
 				}
-				getDir(root, m3u, pls, mp3);
+				getDir(pathNow, m3u, pls, mp3);
 			}
 		});
 		
@@ -147,6 +155,10 @@ public class FolderExplorer extends ListActivity {
 		item.add("../");
 		path.add(f.getParent()); 
 
+		if(!stPath.equals(pathNow)){
+			pathNow = stPath;
+		}
+		
 		if(!stPath.equals(root))
 		{
 			item.add(root);

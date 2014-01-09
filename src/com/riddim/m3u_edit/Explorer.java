@@ -28,8 +28,10 @@ public class Explorer extends ListActivity {
 	private String root;
 	private TextView myPath;
 	String stPath;
+	private String pathNow = "";
 	String playpath;
-
+	String filepath;
+	
 	boolean m3u, pls, mp3;
 
 	@Override
@@ -38,6 +40,7 @@ public class Explorer extends ListActivity {
 		setContentView(R.layout.explorer);
 		myPath = (TextView) findViewById(R.id.path);
 
+		
 		// set checkbox 
 		final CheckBox checkm3u = (CheckBox) findViewById(R.id.checkm3u);
 		if (!checkm3u.isChecked()) {
@@ -66,6 +69,11 @@ public class Explorer extends ListActivity {
 			myPath.setText(stPath);
 		}
 
+
+		if(pathNow.equals("")){
+			pathNow = stPath;
+		}
+		
 		m3u = true; pls = false; mp3 = false;
 
 		getDir(stPath, m3u, pls, mp3);
@@ -79,7 +87,7 @@ public class Explorer extends ListActivity {
 				} else{
 					m3u = false;	
 				}
-				getDir(stPath, m3u, pls, mp3);
+				getDir(pathNow, m3u, pls, mp3);
 			}
 		});
 
@@ -92,7 +100,7 @@ public class Explorer extends ListActivity {
 				} else{
 					pls = false;
 				}
-				getDir(stPath, m3u, pls, mp3);
+				getDir(pathNow, m3u, pls, mp3);
 			}
 		});
 
@@ -106,7 +114,7 @@ public class Explorer extends ListActivity {
 				} else{
 					mp3 = false;
 				}
-				getDir(stPath, m3u, pls, mp3);
+				getDir(pathNow, m3u, pls, mp3);
 			}
 		});
 	}
@@ -122,6 +130,10 @@ public class Explorer extends ListActivity {
 		item.add("../");
 		path.add(f.getParent()); 
 
+		if(!stPath.equals(pathNow)){
+			pathNow = stPath;
+		}
+		
 		if(!stPath.equals(root))
 		{
 			item.add(root);
@@ -188,6 +200,7 @@ public class Explorer extends ListActivity {
 				@Override
 				public void onClick(DialogInterface arg0, int arg1) {
 					playpath = file.getName();
+					filepath = file.getParent();
 					launchIntent();
 				}
 			});
@@ -200,6 +213,7 @@ public class Explorer extends ListActivity {
 	private void launchIntent() {
 		Intent i = new Intent(this, MainActivity.class);
 		i.putExtra("playpath", playpath);
+		i.putExtra("filepath", filepath);
 		startActivity(i);
 
 	}
