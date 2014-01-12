@@ -31,7 +31,7 @@ public class Explorer extends ListActivity {
 	private String pathNow = "";
 	String playpath;
 	String filepath;
-	
+	boolean edit =false;
 	boolean m3u, pls, mp3;
 
 	@Override
@@ -66,6 +66,7 @@ public class Explorer extends ListActivity {
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			stPath = extras.getString("the path");
+			edit = extras.getBoolean("editm3u");
 			myPath.setText(stPath);
 		}
 
@@ -214,6 +215,7 @@ public class Explorer extends ListActivity {
 		Intent i = new Intent(this, MainActivity.class);
 		i.putExtra("playpath", playpath);
 		i.putExtra("filepath", filepath);
+		i.putExtra("editm3u", edit);
 		startActivity(i);
 
 	}

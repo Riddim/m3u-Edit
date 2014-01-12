@@ -87,7 +87,12 @@ public class MainActivity extends Base implements ActionBar.TabListener, Edit_Fi
 			} 
 			String value2 = extras.getString("filepath");
 			if(value2 != null){
+				Boolean edit = extras.getBoolean("editm3u");
+				if(edit){
+					viewPager.setCurrentItem(2);
+				} else {
 				viewPager.setCurrentItem(1);
+				}
 			}
 		} else {
 			viewPager.setCurrentItem(0);

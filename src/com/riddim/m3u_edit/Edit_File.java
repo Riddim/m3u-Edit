@@ -164,9 +164,13 @@ public class Edit_File extends Fragment{
 				if(extras.getString("filepath") != null){
 					path = extras.getString("filepath");
 				}
-
+				
 				defaultloc.setText(path);
-				Edit(false);
+				Boolean edit = extras.getBoolean("editm3u");
+				if(!edit){
+					Edit(false);
+				}
+				
 			}
 
 		}

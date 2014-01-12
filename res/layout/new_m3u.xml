@@ -23,7 +23,7 @@
     </EditText>
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/make_butbrowse"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
@@ -33,14 +33,14 @@
     </TableRow>
 
 <Button
-    android:id="@+id/button2"
+    android:id="@+id/make_butmake"
     style="?android:attr/buttonStyleSmall"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Make/Edit" />
 
 <ListView
-    android:id="@+id/listView1"
+    android:id="@+id/make_list"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
 </ListView>
