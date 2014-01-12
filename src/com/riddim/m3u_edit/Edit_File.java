@@ -285,8 +285,6 @@ public class Edit_File extends Fragment{
 
 			try {
 				final BufferedReader reader = new BufferedReader(new FileReader(f));
-
-
 				try {
 					String line;
 					String mp3block =  "";
