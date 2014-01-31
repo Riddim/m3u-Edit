@@ -73,6 +73,9 @@ public class New_M3U  extends Fragment  implements OnCreateContextMenuListener {
 
 	boolean loadingb = false;
 
+	File f = new File(musicpath);
+	File[] files = f.listFiles();
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		view = inflater.inflate(R.layout.new_m3u, container, false);
@@ -678,12 +681,13 @@ public class New_M3U  extends Fragment  implements OnCreateContextMenuListener {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
+			files = sort(sort);
 		}
 
 		@Override
 		protected Long doInBackground(File... params) {
-			File f = new File(musicpath);
-			File[] files = f.listFiles();
+			//File f = new File(musicpath);
+			//File[] files = f.listFiles();
 			//File[] files = sort(sort);
 		
 			for(int i=0; i < files.length; i++)
