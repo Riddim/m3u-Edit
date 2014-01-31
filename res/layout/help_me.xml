@@ -10,7 +10,7 @@
         android:layout_height="match_parent" >
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/Edit_file_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create easy a playlist on the pc with the free program Playlist Creator:" />

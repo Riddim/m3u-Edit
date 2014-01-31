@@ -4,24 +4,31 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.view.View;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.View.OnCreateContextMenuListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Toast;
 
-public class Explorer extends ListActivity {
+public class Explorer extends ListActivity implements OnCreateContextMenuListener  {
 
 	private List<String> item = null;
 	private List<String> path = null;
@@ -118,8 +125,42 @@ public class Explorer extends ListActivity {
 				getDir(pathNow, m3u, pls, mp3);
 			}
 		});
+		
+		getListView().setOnCreateContextMenuListener(new OnCreateContextMenuListener(){
+
+			@Override
+			public void onCreateContextMenu(ContextMenu menu, View v,
+					ContextMenuInfo menuInfo) {
+			     MenuInflater inflater = getMenuInflater();
+			     inflater.inflate(R.menu.explorer, menu);
+			}
+		});
+		
 	}
 
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+	    switch (item.getItemId()) {
+	        case R.id.explorer_delete:
+	        	 File file = new File(path.get(info.position));
+				 file.delete();
+				 dialogok();
+				 getDir(pathNow, m3u, pls, mp3);
+	            return true;
+	        case R.id.explorer_rename:
+	   
+	            return true;
+	            
+	            
+	        default:
+	            return super.onContextItemSelected(item);
+	    }
+	}
+	
+	
+	
+	
 	public void getDir(String stPath, boolean m3u, boolean pls, boolean mp3)
 	{
 		myPath.setText("Location: " + stPath);
@@ -169,7 +210,6 @@ public class Explorer extends ListActivity {
 					item.add(file.getName());
 				}
 			}
-
 		}
 
 		ArrayAdapter<String> fileList =
@@ -210,6 +250,16 @@ public class Explorer extends ListActivity {
 			renameDialog.show();
 		}
 	}
+	
+	public void dialogok(){
+		AlertDialog.Builder renameDialog = new AlertDialog.Builder(this);
+		renameDialog.setIcon(R.drawable.ic_launcher);
+		renameDialog.setTitle("file deleted");
+		renameDialog.setPositiveButton("OK", null);
+		renameDialog.show();
+	}
+	 
+         
 
 	private void launchIntent() {
 		Intent i = new Intent(this, MainActivity.class);

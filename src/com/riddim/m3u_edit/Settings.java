@@ -39,7 +39,9 @@ public class Settings extends Fragment{
 
 	String browsepath;
 	String browse = "0";
+	String numberset = "";
 	
+	boolean show = false;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,	Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.settings, container, false);  
@@ -49,6 +51,30 @@ public class Settings extends Fragment{
 		root = "/storage";
 	//	getDir(root);
 
+		//read files
+				FileInputStream fis3;
+
+				try {
+					fis3 = ((MainActivity)getActivity()).openFileInput("number");
+					byte[] input = new byte[fis3.available()];
+					numberset = "";
+					while (fis3.read(input) != -1) {}
+				
+					numberset += new String(input);
+					
+					TextView number = (TextView) view.findViewById(R.id.numberScreen);
+					number.setText(numberset);
+					
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					numberset = "";
+
+				} catch (IOException e) {
+					e.printStackTrace(); 
+					numberset = "";
+				}  
+			 
+		
 		
 		//read files
 		FileInputStream fis2;
@@ -66,8 +92,10 @@ public class Settings extends Fragment{
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
-
+			if(!show){
+			//((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+			show = true;
+			}
 		} catch (IOException e) {
 			e.printStackTrace(); 
 		}  
@@ -88,8 +116,10 @@ public class Settings extends Fragment{
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
-
+			if(!show){
+				//((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+				show = true;
+			}
 		} catch (IOException e) {
 			e.printStackTrace(); 
 		}  
@@ -118,11 +148,16 @@ public class Settings extends Fragment{
 					outputStream = ((Context)getActivity()).openFileOutput("musicpath", Context.MODE_PRIVATE);
 					outputStream.write(browsepath.getBytes());
 					outputStream.close();
+					if(!show){
 					((MainActivity)getActivity()).createDialog("settingsFile(playlistpath) created", "Proceed", "Succes", true);
-					
+					show = true;
+					}
 					
 				} catch (Exception e) {
+					if(!show){
 					((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
+					show = true;
+					}
 					e.printStackTrace();
 				}
 			}
@@ -138,11 +173,16 @@ public class Settings extends Fragment{
 					outputStream = ((Context)getActivity()).openFileOutput("playpath", Context.MODE_PRIVATE);
 					outputStream.write(browsepath.getBytes());
 					outputStream.close();
+					if(!show){
 					((MainActivity)getActivity()).createDialog("settingsFile(playlistpath) created", "Proceed", "Succes", true);
-					
+					show = true;
+					}
 					
 				} catch (Exception e) {
-					((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
+					if(!show){
+						((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
+						show = true;
+						}
 					e.printStackTrace();
 				}
 			}
@@ -155,7 +195,7 @@ public class Settings extends Fragment{
 			@Override
 			public void onClick(View arg0) {
 				Intent intent = new Intent(getActivity(), FolderExplorer.class);
-			
+				show = false;
 				intent.putExtra("browse", "1");
 				startActivity(intent);
 			
@@ -168,13 +208,53 @@ public class Settings extends Fragment{
 			@Override
 			public void onClick(View arg0) {
 				Intent intent = new Intent(getActivity(), FolderExplorer.class);
-			
+				show = false;
 				intent.putExtra("browse", "2");
 				startActivity(intent);
 			
 			}
 		});
 		
+		
+		
+		Button startscreen = (Button) view.findViewById(R.id.applyscreen);
+		
+		startscreen.setOnClickListener(new OnClickListener(){
+			String strnumber;
+			@Override
+			public void onClick(View v) {
+			TextView number = (TextView) view.findViewById(R.id.numberScreen);
+			try {
+				 
+			int intnumber = Integer.parseInt(number.getText().toString());
+			if(intnumber > 3) {
+				((MainActivity)getActivity()).createDialog("-_- Serious, trying to find bugs huh. Well u failed, startscreen is Settings(3)", "Dismiss", "-_-", true);
+				number.setText("3");
+			} 
+			} catch (Exception e) {
+				((MainActivity)getActivity()).createDialog("No number!!!", "Dismiss", "Error", true);
+				e.printStackTrace();
+				strnumber = "0";
+			}
+			
+			strnumber = number.getText().toString();
+			try {
+				outputStream = ((Context)getActivity()).openFileOutput("number", Context.MODE_PRIVATE);
+				outputStream.write(strnumber.getBytes());
+				outputStream.close();
+				((MainActivity)getActivity()).createDialog("Yahoo, new startscreen!", "Proceed", "Succes", true);
+		
+			} catch (Exception e) {
+				if(!show){
+					((MainActivity)getActivity()).createDialog("No SettingsFile created", "Dismiss", "Error", true);
+					show = true;
+					}
+				e.printStackTrace();
+			}
+			
+			}
+			
+		});
 		
 		/*Button apply = (Button) view.findViewById(R.id.applysettings);
 		apply.setOnClickListener(new OnClickListener(){

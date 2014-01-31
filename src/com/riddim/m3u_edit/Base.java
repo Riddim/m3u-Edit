@@ -6,6 +6,7 @@ import com.riddim.m3u_edit.R;
 import android.app.Dialog;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -17,6 +18,8 @@ public class Base extends FragmentActivity {
 	Button dialogButton;
 	
 	public Button createDialog(CharSequence String, CharSequence ButText, CharSequence Title, Boolean dismiss){
+		
+		
 		final Dialog dialog = new Dialog(context);
 		dialog.setContentView(R.layout.screen_popup);
 		dialog.setTitle(Title);
@@ -35,6 +38,7 @@ public class Base extends FragmentActivity {
 			}
 		});
 		}
-		return dialogButton;
-	}
+	return dialogButton;
+}
+	
 }

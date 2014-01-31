@@ -46,32 +46,39 @@
 
 
     <TableRow>
-<!-- 
-        <Button
-            android:id="@+id/letgo"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Let go" /> -->
 
         <Button
             android:id="@+id/autoedit"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:text="Auto Edit" />
 
         <Button
             android:id="@+id/fullscreen"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="0dip"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Full Screen" />
+            android:text="Raw file" />
     </TableRow>
 
+    <TableRow>
+    <TextView
+        android:id="@+id/Edit_file_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading..."
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:gravity="center_horizontal"/>
+
+    <ProgressBar
+        android:id="@+id/edit_file_progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:gravity="center_horizontal"/>
+</TableRow>
     <ListView
         android:id="@+id/list"
         android:layout_width="wrap_content"

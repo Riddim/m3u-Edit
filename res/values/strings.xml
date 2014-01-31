@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">m3u-Edit</string>
+    <string name="app_name">Pc Playlist Creator</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-
-    
+	
+	<string name="tab_help">Help Me!</string>
+    <string name="tab_PcEdit">Pc Playlist Edit</string>
+    <string name="tab_makeedit">Playlist Make/Edit</string>
+    <string name="tab_Settings">Settings</string>
+    <string name="checkall">Check all</string>
+     <string name="playlistmade">Playlist made!!!!, Pls have some patience, playlist is probably not directly detected by your pre-installed music player, restarting your phone probably helps in that case. You could also download an additional app. Either way it will show up:)</string>
+     
+  
+     
+     
      <string name="help">Use the format m3u.\n
 Now put the m3u file in your playlist folder of your device, or where ever you like. The playlist will not work ,because the paths to the file are wrong. The paths where made by the pc program playlist creator.\n
 To fix this we need to edit the file.\n\n
@@ -34,5 +43,7 @@ The result will look like:\n\n
 #EXTINF:248, -  - R3HAB  - I NEED R3HAB 060\n
 /storage/sdcard1/Music/Syn Cole - Miami 82 (Avicii Edit).mp3\n\n
 </string>
+     <string name="menu_delete">Delete</string>
+     <string name="menu_rename">Rename</string>
     
 </resources>

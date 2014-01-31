@@ -12,11 +12,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,6 +35,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class Edit_File extends Fragment{
@@ -42,12 +49,18 @@ public class Edit_File extends Fragment{
 	String tempfile = "lastplay";
 	FileOutputStream outputStream;
 	boolean settingsread = false;
+
 	String settings = "";
 	ArrayList<String> mp3String = null;
 	OnHeadlineSelectedListener mCallback;
 	MainActivity main = new MainActivity();
 	int count = 0;
-	
+	Message msg = new Message();
+	boolean show = true;
+
+	ProgressDialog progressDialog;
+
+
 	// Container Activity must implement this interface
 	public interface OnHeadlineSelectedListener {
 		public void onArticleSelected(String encoded);
@@ -73,6 +86,11 @@ public class Edit_File extends Fragment{
 
 		TextView defaultloc =(TextView) view.findViewById(R.id.defaultloc);
 
+		ProgressBar	mProgress = (ProgressBar) view.findViewById(R.id.edit_file_progressBar);
+		mProgress.setVisibility(View.GONE);
+		TextView loading = (TextView) view.findViewById(R.id.Edit_file_loading);
+		loading.setVisibility(View.GONE);
+
 
 		//Read File internal file
 
@@ -87,7 +105,11 @@ public class Edit_File extends Fragment{
 
 
 		} catch (FileNotFoundException e) {
-			((MainActivity)getActivity()).createDialog("No Musicfolder found, go to settings!", "Dismiss", "Error", true);
+			if(!show){
+				((MainActivity)getActivity()).createDialog("No Musicfolder found, go to settings!", "Dismiss", "Error", true);
+				show = true;
+				}
+			
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace(); 
@@ -103,16 +125,19 @@ public class Edit_File extends Fragment{
 		try {
 			fis2 = ((MainActivity)getActivity()).openFileInput("playpath");
 			byte[] input = new byte[fis2.available()];
+			settings = "";
 			while (fis2.read(input) != -1) {}
 			settings += new String(input);
 			settingsread = true;
-
 			path = settings;
 			defaultloc.setText(path);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			if(!show){
 			((MainActivity)getActivity()).createDialog("No SettingsFile found", "Dismiss", "Error", true);
+			show = true;
+			}
 			path = "/storage/sdcard1/Music";
 			defaultloc.setText(path);
 
@@ -128,6 +153,7 @@ public class Edit_File extends Fragment{
 			checkBox.setChecked(false);
 		};
 
+
 		// checkbox settings
 		checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			@Override
@@ -142,6 +168,7 @@ public class Edit_File extends Fragment{
 				} else
 				{
 					if (settingsread){
+
 						path = settings;
 					} else {
 						path = "/storage/sdcard1/Music";	
@@ -155,24 +182,23 @@ public class Edit_File extends Fragment{
 
 		Bundle extras = ((MainActivity)getActivity()).getIntent().getExtras();
 		if (extras != null) {
+			Boolean edit = extras.getBoolean("editm3u");
 			String value = extras.getString("playpath");
 
 			EditText loc = (EditText) view.findViewById(R.id.locFile);
 			if(value != null){
-				loc.setText(value);
-
+				if(!edit){
+					loc.setText(value);
+				}
 				if(extras.getString("filepath") != null){
 					path = extras.getString("filepath");
 				}
-				
 				defaultloc.setText(path);
-				Boolean edit = extras.getBoolean("editm3u");
+
 				if(!edit){
 					Edit(false);
 				}
-				
 			}
-
 		}
 
 		Button fullScreen = (Button) view.findViewById(R.id.fullscreen);
@@ -196,167 +222,352 @@ public class Edit_File extends Fragment{
 				Intent intent = new Intent(getActivity(), Explorer.class);
 				intent.putExtra("the path", path);
 				startActivity(intent);
+				show = true;
 			}
 		});
-
-		/*		Button letgo = (Button) view.findViewById(R.id.letgo);
-		letgo.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View arg0) {
-
-				Edit(false);
-			}
-		});*/
 
 		Button autoedit = (Button) view.findViewById(R.id.autoedit);
 		autoedit.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
-
-				Edit(true);
+				EditPlay edit = new EditPlay();
+				edit.execute();
+			//	Edit(true);
 			}
 		});
+		
+
+		
+
 		return view;
 	}
 
-	public void Edit(boolean auto){
-		Boolean access = isExternalStorageWritable();
-		encoded = "";
-		notExist = "";
-		if(access){
-			String strFilePath;
-			TextView FilePath = (TextView) view.findViewById(R.id.locFile);
-			strFilePath = FilePath.getText().toString();
-			File myDir = new File(path);    
-			myDir.mkdirs();
-			File f = new File (myDir, strFilePath);
-			StringBuffer sb = new StringBuffer();
-			mp3String = new ArrayList<String>();
+	
+	
+	
+	Handler mHandler = new Handler()
+	{
+		public void handleMessage(Message msg)
+		{
+			 	progressDialog.dismiss();
+		}
+	};
 
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(f));
-				String line;
-				String replauto;
-				
-				replauto = (musicpath + "/");
-				while(true)
-				{
-					line=br.readLine();
-					if(line==null)
-						break;
-					sb.append(line + "\n");				 					    
-					if(!auto){
-						int cnt1 = sb.indexOf(lineChange);
-						if (cnt1 >= 0){
-							sb.replace(cnt1,cnt1+lineChange.length(), replace);
-						}
-					}
-					else {
-						int last = sb.lastIndexOf("\\");
-						int del = line.lastIndexOf("\\");
-						if(last >= 0 && del >=0)
+	public void Edit(final boolean auto){
+		final ProgressBar	mProgress = (ProgressBar) view.findViewById(R.id.edit_file_progressBar);
+		mProgress.setVisibility(View.VISIBLE);
+		final TextView loading = (TextView) view.findViewById(R.id.Edit_file_loading);
+		loading.setVisibility(View.VISIBLE);
+
+		Thread thread = new Thread()
+		{
+			@Override
+			public void run() {
+	
+				Boolean access = isExternalStorageWritable();
+				encoded = "";
+				notExist = "";
+				if(access){
+					String strFilePath;
+					TextView FilePath = (TextView) view.findViewById(R.id.locFile);
+					strFilePath = FilePath.getText().toString();
+					File myDir = new File(path);    
+					myDir.mkdirs();
+					File f = new File (myDir, strFilePath);
+					StringBuffer sb = new StringBuffer();
+					mp3String = new ArrayList<String>();
+
+					try {
+						BufferedReader br = new BufferedReader(new FileReader(f));
+						String line;
+						final String replauto;
+
+						replauto = (musicpath + "/");
+						while(true)
 						{
-							sb.replace(last - del, last + 1 , replauto);
-						}
-						int last2 = sb.lastIndexOf("/");
-						int del2 = line.lastIndexOf("/");
-						if(last2 >= 0 && del2 >=0)
-						{
-							sb.replace(last2 - del2, last2 + 1 , replauto);
-						}
-					}
-				}
-				br.close();
-				if(auto){
-					((MainActivity)getActivity()).createDialog("Auto Edit completed! New path: " + replauto, "Ok", "NICE", true);
-				}
-			}
-			catch (IOException e) {
-				strFilePath ="";
-				((MainActivity)getActivity()).createDialog("Error no such file or directory, try a different name or path", "Dismiss", "Error", true);
-				f.delete();
-				e.printStackTrace();
-			}
-			try{
-				FileWriter fstream = new FileWriter(f);
-				BufferedWriter outobj = new BufferedWriter(fstream);
-				outobj.write(sb.toString());
-				outobj.close();
-
-			}catch (Exception e){
-				System.err.println("Error: " + e.getMessage());
-			}
-
-			try {
-				final BufferedReader reader = new BufferedReader(new FileReader(f));
-				try {
-					String line;
-					String mp3block =  "";
-					while ((line = reader.readLine()) != null) {
-						
-						if(line.equals("#EXTM3U")){
-							mp3String.add(line);
-
-						} else {
-							if(!line.endsWith(".mp3")){
-								mp3block += (line + "\n");
-							}	
-							else {
-								File file = new File(line);
-								if(file.exists())  {
-
-									mp3block += line;
-									mp3String.add(mp3block);
-									mp3block = "";
+							line=br.readLine();
+							if(line==null)
+								break;
+							sb.append(line + "\n");				 					    
+							if(!auto){
+								int cnt1 = sb.indexOf(lineChange);
+								if (cnt1 >= 0){
+									sb.replace(cnt1,cnt1+lineChange.length(), replace);
 								}
-								else {
-
-									mp3block += line;
-									mp3String.add(mp3block);
-									count++;
-									notExist += (mp3block + "\n"); 
-									mp3block = "";
+							}
+							else {
+								int last = sb.lastIndexOf("\\");
+								int del = line.lastIndexOf("\\");
+								if(last >= 0 && del >=0)
+								{
+									sb.replace(last - del, last + 1 , replauto);
+								}
+								int last2 = sb.lastIndexOf("/");
+								int del2 = line.lastIndexOf("/");
+								if(last2 >= 0 && del2 >=0)
+								{
+									sb.replace(last2 - del2, last2 + 1 , replauto);
 								}
 							}
 						}
-						encoded += (line + "\n");
-					}
-					if(!notExist.equals("")){
-						if(count<5){
-							
-							((MainActivity)getActivity()).createDialog("Did not exist:\n" + notExist, "Dismiss", "Error", true);
-						} else {
-							((MainActivity)getActivity()).createDialog("A lot of wrong paths, check the crosses XD", "Dismiss", "Error", true);
+						br.close();
+						if(auto){		
+							((MainActivity)getActivity()).runOnUiThread(new Runnable() {
+								public void run() {
+									((MainActivity)getActivity()).createDialog("Auto Edit completed! New path: " + replauto, "Ok", "NICE", true);
+								}
+							});
+
 						}
-						count =0;
-						
+					}
+
+
+
+					catch (IOException e) {
+						strFilePath ="";
+						((MainActivity)getActivity()).runOnUiThread(new Runnable() {
+							public void run() {
+								((MainActivity)getActivity()).createDialog("Error no such file or directory, try a different name or path", "Dismiss", "Error", true);
+							}
+						});
+
+
+						f.delete();
+						e.printStackTrace();
+
+					}
+
+
+					try{
+						FileWriter fstream = new FileWriter(f);
+						BufferedWriter outobj = new BufferedWriter(fstream);
+						outobj.write(sb.toString());
+						outobj.close();
+
+					}catch (Exception e){
+						System.err.println("Error: " + e.getMessage());
+					}
+
+					try {
+						final BufferedReader reader = new BufferedReader(new FileReader(f));
+						try {
+							String line;
+							String mp3block =  "";
+							while ((line = reader.readLine()) != null) {
+
+								if(line.equals("#EXTM3U")){
+								//	mp3String.add(line);
+
+								} else {
+									if(!line.endsWith(".mp3")){
+										mp3block += (line + "\n");
+									}	
+									else {
+										File file = new File(line);
+										if(file.exists())  {
+
+											mp3block += line;
+											mp3String.add(line);
+											mp3block = "";
+										}
+										else {
+
+											mp3block += line;
+											mp3String.add(line);
+											count++;
+											notExist += (mp3block + "\n"); 
+											mp3block = "";
+										}
+									}
+								}
+								encoded += (line + "\n");
+							}
+
+							if(!notExist.equals("")){
+								((MainActivity)getActivity()).runOnUiThread(new Runnable() {
+									public void run() {
+
+										if(show){
+											if(count<5){
+												((MainActivity)getActivity()).createDialog("Did not exist:\n" + notExist, "Dismiss", "Error", true);
+
+											} else {
+												((MainActivity)getActivity()).createDialog("A lot of wrong paths, check the crosses XD", "Dismiss", "Error", true);
+											}
+											show = false;
+										}
+										count = 0;
+									}
+								});	
+							}
+						}
+						finally {
+
+							reader.close();
+
+						}
+
+						((MainActivity)getActivity()).runOnUiThread(new Runnable() {
+							public void run() {
+								populateListview();
+								mProgress.setVisibility(View.GONE);
+								loading.setVisibility(View.GONE);
+							}
+						});
+
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				}
-				finally {
-
-					reader.close();
+				else{	
+					//			main.createDialog("Error no access to sd card", "Ok", "Error", true);
 				}
-				populateListview();
+			}
+		};
+		thread.start();
 
-				
+	}
 
-				//	ArrayAdapter<String> listmp3 =
-				//			new ArrayAdapter<String>(getActivity(), R.layout.row2, mp3String);
-				//	setListAdapter(listmp3); 
+	private class EditPlay extends AsyncTask<Long, Integer, Long> {
 
-				mCallback.onArticleSelected(encoded);
-				
-				
-			} catch (IOException e) {
-				e.printStackTrace();
+		@Override
+		protected void onPostExecute(Long result) {
+			super.onPostExecute(result);
+			populateListview();
+			mHandler.sendEmptyMessage(0);
+			if(notExist.equals("")){
+				((MainActivity)getActivity()).createDialog("AutoEdit completed!!! "  , "Okey", "Done", true);
+			} else {
+				if(show){
+					if(count<5){
+						((MainActivity)getActivity()).createDialog("AutoEdit completed!!!\n but... did not exist:\n" + notExist, "Dismiss", "Error", true);
+
+					} else {
+						((MainActivity)getActivity()).createDialog("A lot of wrong paths, check the crosses XD", "Dismiss", "Error", true);
+					}
+					show = false;
+				}
+				count = 0;
 			}
 		}
-		else{	
 
-			main.createDialog("Error no access to sd card", "Ok", "Error", true);
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			show = true;
+			progressDialog = ProgressDialog.show(getActivity(), "", "Loading...");	
+		}
+
+		@Override
+		protected Long doInBackground(Long... arg0) {
+			encoded = "";
+			notExist = "";
+				String strFilePath;
+				TextView FilePath = (TextView) view.findViewById(R.id.locFile);
+				strFilePath = FilePath.getText().toString();
+				File myDir = new File(path);    
+				myDir.mkdirs();
+				File f = new File (myDir, strFilePath);
+				StringBuffer sb = new StringBuffer();
+				mp3String = new ArrayList<String>();
+
+				try {
+					BufferedReader br = new BufferedReader(new FileReader(f));
+					String line;
+					final String replauto;
+
+					replauto = (musicpath + "/");
+					while(true)
+					{
+						line=br.readLine();
+						if(line==null)
+							break;
+						sb.append(line + "\n");				 					    
+				
+					
+							int last = sb.lastIndexOf("\\");
+							int del = line.lastIndexOf("\\");
+							if(last >= 0 && del >=0)
+							{
+								sb.replace(last - del, last + 1 , replauto);
+							}
+							
+							int last2 = sb.lastIndexOf("/");
+							int del2 = line.lastIndexOf("/");
+							if(last2 >= 0 && del2 >=0) {
+								sb.replace(last2 - del2, last2 + 1 , replauto);	
+						}
+					}
+					br.close();
+				}
+
+				catch (IOException e) {
+					strFilePath ="";
+					f.delete();
+					e.printStackTrace();
+
+				}
+
+				try{
+					FileWriter fstream = new FileWriter(f);
+					BufferedWriter outobj = new BufferedWriter(fstream);
+					outobj.write(sb.toString());
+					outobj.close();
+
+				}catch (Exception e){
+					System.err.println("Error: " + e.getMessage());
+				}
+
+				try {
+					final BufferedReader reader = new BufferedReader(new FileReader(f));
+					try {
+						String line;
+						String mp3block =  "";
+						while ((line = reader.readLine()) != null) {
+
+							if(line.equals("#EXTM3U")){
+							//	mp3String.add(line);
+
+							} else {
+								if(!line.endsWith(".mp3")){
+									mp3block += (line + "\n");
+								}	
+								else {
+									File file = new File(line);
+									if(file.exists())  {
+
+										mp3block += line;
+										mp3String.add(line);
+										mp3block = "";
+									}
+									else {
+										mp3block += line;
+										mp3String.add(line);
+										count++;
+										notExist += (line + "\n"); 
+										mp3block = "";
+									}
+								}
+							}
+							encoded += (line + "\n");
+						}
+					}
+					finally {
+						reader.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			return null;
 		}
 	}
 
+
+	public class PullTasksThread extends Thread {
+		public void run () {
+			populateListview();
+		}
+	}
 
 
 	private void populateListview() {
@@ -378,11 +589,11 @@ public class Edit_File extends Fragment{
 			}
 			String current = mp3String.get(position);
 
-			if(position == 0){
+		//	if(position == 0){
 
-				ImageView imageView = (ImageView) itemView.findViewById(R.id.vink);
-				imageView.setImageDrawable(null);
-			} else {
+			//	ImageView imageView = (ImageView) itemView.findViewById(R.id.vink);
+		//		imageView.setImageDrawable(null);
+		//	} else {
 				if(notExist.contains(current)){
 					ImageView imageView = (ImageView) itemView.findViewById(R.id.vink);
 					imageView.setImageResource(R.drawable.cross);
@@ -390,28 +601,24 @@ public class Edit_File extends Fragment{
 					ImageView imageView = (ImageView) itemView.findViewById(R.id.vink);
 					imageView.setImageResource(R.drawable.vinkje);
 				}
-			}
+		//	}
 			TextView txt = (TextView) itemView.findViewById(R.id.rowtext);
 			txt.setText(mp3String.get(position));
+
+
+			txt.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+
+
+				}
+			});
+
+
 
 			return itemView;
 		}
 	}
-
-	/*
-	// read user input
-	public String DefaultProg(){	
-		TextView Change =(TextView) view.findViewById(R.id.replace);
-		lineChange = Change.getText().toString();
-
-		TextView Repl =(TextView) view.findViewById(R.id.replacewith);
-		replace = Repl.getText().toString();
-
-		return lineChange + replace;
-	}
-	 */
-
-
 
 	// check external storage 
 	public boolean isExternalStorageWritable() {
